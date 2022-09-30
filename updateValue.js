@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 
-    let fundCodeList = '000051,000071,000216,000478,000563,000614,000942,000968,001052,001092,001180,001469,001513,001552,001717,002656,002708,004424,004752,006327,012348,014424,050025,090010,100032,100038,110020,110022,110027,160119,161017,164906,270048,340001,502010,519915'
-    let cnStockCode = "sz159920,sz159938,sz164906,sh512880,sh512980,sh513050,sh513180,sh515180"
+    let fundCodeList = '000051,000071,000216,000478,000563,000614,000727,000942,000968,001052,001092,001180,001469,001513,001552,001717,002656,002708,004424,004752,006327,012348,014424,050025,090010,100032,100038,110020,110022,110027,160119,161017,164906,270048,340001,502010,519915'
+    let cnStockCode = "sz159920,sz159938,sz159938,sz164906,sh512880,sh512980,sh513050,sh513180,sh515180"
     let usStockCode = 'KWEB';
     let marketstackToken = '05327ef078e71229a2753ea591a42731';
     const assertPricelist = [];
@@ -48,35 +48,6 @@ async function queryValue() {
         assertPricelist.push(assertPriceObject);
     }
     
-    //Update Crypt and Update
-    // let apiResponseCrypt = await fetch('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=5000&CMC_PRO_API_KEY=bc6bddc1-6294-4ecf-9dff-22e2b5d27335');
-    // let responseDataCrypt = await apiResponseCrypt.json();
-    // let BTCPrice;
-    // let ETHPrice;
-    // let USDTPrice;
-    // for (let record of responseDataCrypt.data) {
-    //     if (record.name == 'Bitcoin') {
-    //         BTCPrice = Number(record.quote.USD.price);
-    //         // console.log(record.symbol + " - " + record.name + " - " + record.last_updated + " - " + BTCPrice);
-
-    //     }
-
-    //     if (record.name == 'Ethereum') {
-    //         ETHPrice = Number(record.quote.USD.price);
-    //         // console.log(record.symbol + " - " + record.name + " - " + record.last_updated + " - " + ETHPrice);
-
-    //     }
-
-    //     if (record.name == 'Tether') {
-    //         USDTPrice = Number(record.quote.USD.price);
-    //         // console.log(record.symbol + " - " + record.name + " - " + record.last_updated + " - " + USDTPrice);
-
-    //     }
-
-    // }
-    // const assertPriceObjectBTC = new assertPrice("BTC", now(), BTCPrice, true);
-    // assertPricelist.push(assertPriceObjectBTC);
-
     // Query US StockPrice
     let apiResponseStock = await fetch('http://api.marketstack.com/v1/eod/latest?access_key=05327ef078e71229a2753ea591a42731&symbols=' + usStockCode);
     let responseDataStock = await apiResponseStock.json();
@@ -90,6 +61,28 @@ async function queryValue() {
         const stockPriceObject = new assertPrice(stockSymbol, stockDate, stockPrice, true);
         assertPricelist.push(stockPriceObject);
     }
+
+    // Update Crypt and Update
+    let apiBTCResponseCrypt = await fetch('https://rest.coinapi.io/v1/exchangerate/BTC/USD?apikey=F5EED9BE-FF36-4E40-A10B-71331E44C042');
+    let responseBTCDataCrypt = await apiBTCResponseCrypt.json();
+    let BTCPrice = responseBTCDataCrypt.rate;
+    let BTCDateTime = responseBTCDataCrypt.time;
+    const assertPriceObjectBTC = new assertPrice("BTC", BTCDateTime, BTCPrice, true);
+    assertPricelist.push(assertPriceObjectBTC);
+
+    let apiETHResponseCrypt = await fetch('https://rest.coinapi.io/v1/exchangerate/ETH/USD?apikey=F5EED9BE-FF36-4E40-A10B-71331E44C042');
+    let responseETHDataCrypt = await apiETHResponseCrypt.json();
+    let ETHPrice = responseETHDataCrypt.rate;
+    let ETHDateTime = responseETHDataCrypt.time;
+    const assertPriceObjectETH = new assertPrice("ETH", ETHDateTime, ETHPrice, true);
+    assertPricelist.push(assertPriceObjectETH);
+
+    let apiUSDTResponseCrypt = await fetch('https://rest.coinapi.io/v1/exchangerate/USDT/USD?apikey=F5EED9BE-FF36-4E40-A10B-71331E44C042');
+    let responseUSDTDataCrypt = await apiUSDTResponseCrypt.json();
+    let USDTPrice = responseUSDTDataCrypt.rate;
+    let USDTDateTime = responseUSDTDataCrypt.time;
+    const assertPriceObjectUSDT = new assertPrice("USDT", USDTDateTime, USDTPrice, true);
+    assertPricelist.push(assertPriceObjectUSDT);
 
     // Update Price 
     for (let assertPriceUpdatesRecord of assertPricelist) {
